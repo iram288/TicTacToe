@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe vs AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background: #f0f0f0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border: 2px solid #000;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #e6e6e6;
+    }
+
+    .status {
+      font-size: 1.2em;
+      margin: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🤖 Tic Tac Toe vs Computer</h1>
+  <div class="status" id="status">Your Turn (X)</div>
+  <div class="board" id="board"></div>
+  <button onclick="restartGame()">Restart</button>
+
+  <script>
+    const board = document.getElementById("board");
+    const status = document.getElementById("status");
+    let cells = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer = "X";
+    let gameOver = false;
+
+    function createBoard() {
+      board.innerHTML = "";
+      cells.forEach((value, index) => {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = value;
+        cell.addEventListener("click", () => handleClick(index));
+        board.appendChild(cell);
+      });
+    }
+
+    function handleClick(index) {
+      if (cells[index] !== "" || gameOver || currentPlayer !== "X") return;
+
+      cells[index] = "X";
+      updateGame();
+
+      if (!gameOver) {
+        currentPlayer = "O";
+        status.textContent = "Computer's Turn (O)";
+        setTimeout(() => computerMove(), 500);
+      }
+    }
+
+    function computerMove() {
+      let emptyIndices = cells.map((val, i) => val === "" ? i : null).filter(i => i !== null);
+      if (emptyIndices.length === 0) return;
+
+      let move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      cells[move] = "O";
+      updateGame();
+
+      if (!gameOver) {
+        currentPlayer = "X";
+        status.textContent = "Your Turn (X)";
+      }
+    }
+
+    function updateGame() {
+      createBoard();
+      const winner = checkWinner();
+
+      if (winner) {
+        status.textContent = `${winner === "X" ? "🎉 You" : "🤖 Computer"} Win!`;
+        gameOver = true;
+      } else if (cells.every(c => c !== "")) {
+        status.textContent = "🤝 It's a Draw!";
+        gameOver = true;
+      }
+    }
+
+    function checkWinner() {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
+
+      for (let [a, b, c] of winPatterns) {
+        if (cells[a] && cells[a] === cells[b] && cells[b] === cells[c]) {
+          return cells[a];
+        }
+      }
+      return null;
+    }
+
+    function restartGame() {
+      cells = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = "X";
+      gameOver = false;
+      status.textContent = "Your Turn (X)";
+      createBoard();
+    }
+
+    createBoard();
+  </script>
+
+</body>
+</html>
